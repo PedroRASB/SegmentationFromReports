@@ -2,7 +2,7 @@
 
 > Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
 
-We use Llama 3.1 (zero-shot) and radiologist-designed prompts to extract tumor information (count, diameters, locations) from free-text radiology reports. We run the LLM *only once*, and store its outputs. Later, this information will be used by our new loss functions to train the segmentation model.
+We use Qwen 3 (zero-shot) and radiologist-designed prompts to extract tumor information (count, diameters, locations) from free-text radiology reports. We run the LLM *only once*, and store its outputs. Later, this information will be used by our new loss functions to train the segmentation model.
 
 > **Merlin:** We already ran our LLM over the entire Melrin dataset, extracting information about multiple tumor types. So, for Merlin, you can skip this readme and just get the LLM outputs, which are the .csv files [here](../rsuper_train/Merlin_metadata_hf_clean.csv)
 
@@ -38,7 +38,7 @@ Our requirement is simple: just organize your reports in a single csv file. It m
 
 ## Run LLM
 
-The code below will run the LLM (Llama 3.1) to extract tumor information from all reports. The LLM requires 80GB of GPU memory. You can use 1 GPU with 80GB, 2 with 40, 4 with 20,... The command below uses 2 GPUs of 40GB each. Please check the command explanation below and adapt it to your computer. P.S.: the code below may slightly change the name of your save file (/path/to/output.csv).
+The code below will run the LLM to extract tumor information from all reports. The LLM requires 80GB of GPU memory. You can use 1 GPU with 80GB, 2 with 40, 4 with 20,... The command below uses 2 GPUs of 40GB each. Please check the command explanation below and adapt it to your computer. P.S.: the code below may slightly change the name of your save file (/path/to/output.csv).
 
 ```bash
 export NCCL_P2P_DISABLE=1
@@ -46,7 +46,7 @@ bash LaunchMultiGPUFlex.sh \
     /path/to/reports.csv \
     /path/to/output_LLM.csv \
     "type and size multi-organ" \
-    large \
+    qwen3 \
     2 \
     1 \
     2 \
@@ -66,7 +66,7 @@ Parameters
 	•	DATA_PATH: path to reports (csv)
 	•	SAVE_NAME: path to output (csv)
 	•	STEP: LLM task. Set to 'type and size multi-organ'
-	•	LLM_SIZE (small/large/deepseek): which LLM to load. Large means Llama 3.1 70B AWQ. You can easily use other LLMs by editing the command vllm serve inside LaunchMultiGPUFlex.sh
+	•	LLM_SIZE (small/large/deepseek): which LLM to load. You can easily use other LLMs by editing the command vllm serve inside LaunchMultiGPUFlex.sh
 	•	NUM_GPUS: number of GPUs to use. The more the better
 	•	INST_PER_GPU: LLM instances per GPU. Set to 1
 	•	GPU_PER_INST (overrides INST_PER_GPU): how many GPUs are used by each LLM instance. This depends on your GPU memory. Each LLM uses about 80GB. Thus, you want GPU_PER_INST*GPU memory ~= 80. E.g., set to 2 for GPUs with 40GB, and 1 for GPUs with 80GB
