@@ -3,6 +3,9 @@
 </div>
 
 # Training and Testing R-Super
+
+> Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
+
 This code uses our novel Volume Loss and Ball Loss to train a tumor segmentation AI, using both radiology reports and segmentation masks. The code below uses the [MedFormer](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) architecture. 
 
 <details>
