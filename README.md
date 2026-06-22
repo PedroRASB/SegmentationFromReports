@@ -6,6 +6,12 @@ Abstract:
 
 More than 300 million computed tomography (CT) scans are performed worldwide each year, yet many early or incidental tumors in these scans remain undetected. Artificial intelligence (AI) could help: segmentation models can surpass radiologists and alternative AI models in detecting tumors, and they localize the tumors for radiologist verification. However, segmentation-based tumor detection has long been limited by the need for tumor masks: radiologist-drawn tumor outlines that are scarce, expensive, and entirely unavailable for many cancer types. In contrast, nearly every CT scan is accompanied by a radiology report with detailed tumor descriptions. Yet, these reports have not been used effectively to train tumor segmentation models. Here, we introduce R-Super, a framework that converts routine radiology and pathology reports into localized training signals for tumor segmentation. R-Super trains AI to segment tumors that match their descriptions in reports. Reports are only needed for training, not inference. We trained R-Super on 127,496 CT-Report pairs (42 million 2D images, USA) and evaluated it internally at UCSF (*N*=2,301, USA) and externally at Stanford (*N*=1,976, USA), Medipol (*N*=1,327, Turkey), and Basel (*N*=2,935, Switzerland). R-Super detects 7 tumor types for which public tumor masks are scarce or absent: spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal tumors. Training R-Super on over 100,000 reports (no mask) outperformed mask-based segmentation models trained on 870 masks, demonstrating that large-scale report-based training surpasses smaller-scale mask-based training. Alternatively, by training R-Super on both these reports and masks together, cancer detection sensitivity increased by over +11% beyond mask-only training, and DSC by +14%. R-Super significantly surpassed 6 alternative training frameworks trained on the same dataset and 9 leading public AI models. R-Super significantly surpassed six radiologists in detecting six tumor types and matched them for uterus tumors in a reader study. On average, R-Super detected 56% more malignant tumors than the radiologists, at matched false positive rate. These results show that radiology reports are not merely clinical documentation, but a large-scale, underutilized source of localized supervision for training more accurate cancer detection AI. By effectively learning from reports, R-Super enables tumor segmentation models to scale beyond scarce radiologist-drawn tumor masks and advances automated and incidental cancer detection closer to clinical deployment. We release code, over 22,000 CT scans and reports, and the first public AI model to reach or surpass radiologist performance in detecting these tumor types on CT.
 
+<p align="center">
+  <img src="documents/rsuper_examples.png" width="100%"/>
+</p>
+
+<p align="center"><i>R-Super segments seven tumor types that have scarce or no public tumor masks. Top: input CT; bottom: R-Super tumor segmentation (orange).</i></p>
+
 > [!NOTE]
 > **The first public AI to reach or surpass radiologists on seven understudied cancers.** Trained on 100,000+ radiology reports, R-Super segments spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal tumors, detecting 56% more malignant tumors than radiologists at matched specificity. Read the preprint [here](https://arxiv.org/abs/2510.14803).
 
@@ -20,6 +26,12 @@ More than 300 million computed tomography (CT) scans are performed worldwide eac
 
 
 ## Novel loss functions: reports supervise segmentation
+
+<p align="center">
+  <img src="documents/rsuper_method.png" width="80%"/>
+</p>
+
+<p align="center"><i>The R-Super training framework: an LLM extracts tumor information from radiology and pathology reports, and four loss functions teach the segmentation model to produce tumors that match the report descriptions.</i></p>
 
 R-Super introduces report-supervision loss functions. The **Volume Loss** enforces the volume of the segmented tumors to match the tumor volume estimated from the report. **Ball Loss** enforces each segmented tumor to match the number, rough location, and diameter described in the report. The **Attenuation Loss** enforces segmented tumors to match the attenuation (relative brightness) in reports. The **Malignancy Loss** teaches the model to distinguish malignant from benign tumors.
 
