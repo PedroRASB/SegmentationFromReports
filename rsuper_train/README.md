@@ -1,7 +1,3 @@
-<div align="center">
-  <img src="../documents/logo.png" alt="logo" width="100" />
-</div>
-
 # Training and Testing R-Super
 
 > Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
@@ -21,16 +17,6 @@ The core of R-Super is its new report supervision loss functions: the Ball Loss 
 
 > **Teting only:** If you only want to test a trained R-Super model, do the installantion (below), then skip directly to the testing section in the end of this page.
 
-
-#### Volume Loss
-<div align="center">
-  <img src="../documents/volume_loss.png" alt="logo" width="600" />
-</div>
-
-#### Ball Loss
-<div align="center">
-  <img src="../documents/ball_loss.png" alt="logo" width="600" />
-</div>
 
 ## Installation
 
