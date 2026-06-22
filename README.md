@@ -55,6 +55,8 @@ This paper builds on the methodology in our prior conference work "Learning Segm
 
 Reference to the conference work: Bassi, P.R.A.S. et al. (2026). Learning Segmentation from Radiology Reports. In: Gee, J.C., et al. Medical Image Computing and Computer Assisted Intervention – MICCAI 2025. MICCAI 2025. Lecture Notes in Computer Science, vol 15964. Springer, Cham. https://doi.org/10.1007/978-3-032-04971-1_29
 
+Github: https://github.com/MrGiovanni/R-Super
+
 > Awards: MICCAI 2025 Best Paper Award (runner-up, top 2 of 1,027 papers) · RSNA 2025 Certificate of Merit Award.
 
 ## Papers
