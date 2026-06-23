@@ -13,7 +13,7 @@ More than 300 million computed tomography (CT) scans are performed worldwide eac
 <p align="center"><i>R-Super segments seven tumor types that have scarce or no public tumor masks. Top: input CT; bottom: R-Super tumor segmentation (orange).</i></p>
 
 > [!NOTE]
-> **The first public AI to reach or surpass radiologists on seven understudied cancers.** Trained on 100,000+ radiology reports, R-Super segments spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal tumors, detecting 56% more malignant tumors than radiologists at matched specificity. Read the preprint [here](https://arxiv.org/abs/2510.14803).
+> **The first public AI to reach or surpass radiologists on seven understudied cancers.** Trained on 100,000+ CT scans and radiology reports, R-Super segments spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal tumors, detecting 56% more malignant tumors than radiologists at matched specificity. Read the preprint [here](https://arxiv.org/abs/2510.14803).
 
 ## Detailed Code Instructions
 
@@ -33,18 +33,18 @@ More than 300 million computed tomography (CT) scans are performed worldwide eac
 
 <p align="center"><i>The R-Super training framework: an LLM extracts tumor information from radiology and pathology reports, and four loss functions teach the segmentation model to produce tumors that match the report descriptions.</i></p>
 
-R-Super introduces report-supervision loss functions. The **Volume Loss** enforces the volume of the segmented tumors to match the tumor volume estimated from the report. **Ball Loss** enforces each segmented tumor to match the number, rough location, and diameter described in the report. The **Attenuation Loss** enforces segmented tumors to match the attenuation (relative brightness) in reports. The **Malignancy Loss** teaches the model to distinguish malignant from benign tumors.
+The **Volume Loss** enforces the volume of the segmented tumors to match the tumor volume estimated from the report. **Ball Loss** enforces each segmented tumor to match the number, rough location, and diameter described in the report. The **Attenuation Loss** enforces segmented tumors to match the attenuation (relative brightness) in reports. The **Malignancy Loss** teaches the model to distinguish malignant from benign tumors.
 
 
 ## Acknowledgement
 
-This work was supported by the Lustgarten Foundation for Pancreatic Cancer Research and the McGovern Foundation. Paper content is covered by patents pending.
+This work was supported by the Lustgarten Foundation for Pancreatic Cancer Research. Paper content is covered by patents pending.
 
 ---
 
 ## Relationship to Previous Conference Paper
 
-This paper builds on the methodology in our prior conference work "Learning Segmentation From Radiology Reports", winner of the MICCAI 2025 Best Paper Award (top 2 of 1,027 accepted papers). This paper presents several substantive advancements over the conference work:
+This paper builds on the methodology in our prior conference work "Learning Segmentation From Radiology Reports", winner of the *MICCAI 2025 Best Paper Award* (top 2 of 1,027 accepted papers). This paper presents several substantive advancements over the conference work:
 
 1. **Scope:** In the conference work, we detected pancreatic and kidney tumors. We now detect seven different tumor types. Unlike pancreatic and kidney tumors, these tumor types have scarce or no publicly available tumor masks and cannot be accurately detected by public AI models. This paper presents the first public AI model shown to surpass radiologists in detecting these cancers on CT.
 2. **Scale:** We increase the training dataset from 6,718 to 127,496 CT-Report pairs and add over 1,500 tumor masks created by 31 radiologists. This moves from a proof-of-concept dataset to hospital-scale training.
@@ -64,8 +64,8 @@ Github: https://github.com/MrGiovanni/R-Super
 **This repository accompanies our new preprint:**
 
 <b>Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports</b> <br/>
-[Pedro R. A. S. Bassi](https://scholar.google.com/citations?user=NftgL6gAAAAJ&hl=en), Xinze Zhou, [Wenxuan Li](https://scholar.google.com/citations?hl=en&user=tpNZM2YAAAAJ), Szymon Płotka, [Jieneng Chen](https://scholar.google.com/citations?user=yLYj88sAAAAJ&hl=zh-CN), [Sergio Decherchi](https://scholar.google.com/citations?user=T09qQ1IAAAAJ&hl=it), [Andrea Cavalli](https://scholar.google.com/citations?user=4xTOvaMAAAAJ&hl=en), Arkadiusz Sitek, [Kang Wang](https://radiology.ucsf.edu/people/kang-wang), [Yang Yang](https://scholar.google.com/citations?hl=en&user=6XsJUBIAAAAJ), [Alan Yuille](https://www.cs.jhu.edu/~ayuille/), [Zongwei Zhou](https://www.zongweiz.com/)* <br/>
-*Johns Hopkins University, UC San Francisco, Harvard Medical School / Massachusetts General Hospital, Stanford University, and collaborators* <br/>
+[Pedro R. A. S. Bassi](https://scholar.google.com/citations?user=NftgL6gAAAAJ&hl=en), Xinze Zhou, [Wenxuan Li](https://scholar.google.com/citations?hl=en&user=tpNZM2YAAAAJ), Szymon Płotka, [Jieneng Chen](https://scholar.google.com/citations?user=yLYj88sAAAAJ&hl=zh-CN), ...,[Akshay S. Chaudhari](https://scholar.google.com/citations?user=08Y4NhMAAAAJ&hl=en), [Curtis P. Langlotz](https://scholar.google.com.vn/citations?user=WQkBYwQAAAAJ&hl=vi), [Ulas Bagci](https://scholar.google.com/citations?user=9LUdPM4AAAAJ&hl=en), [Sergio Decherchi](https://scholar.google.com/citations?user=T09qQ1IAAAAJ&hl=it), [Andrea Cavalli](https://scholar.google.com/citations?user=4xTOvaMAAAAJ&hl=en), Arkadiusz Sitek, [Kang Wang](https://radiology.ucsf.edu/people/kang-wang), [Yang Yang](https://scholar.google.com/citations?hl=en&user=6XsJUBIAAAAJ), [Alan Yuille](https://www.cs.jhu.edu/~ayuille/), [Zongwei Zhou](https://www.zongweiz.com/)* <br/>
+*Johns Hopkins University, UCSF, Harvard Medical School / Massachusetts General Hospital, Stanford University, and collaborators* <br/>
 Preprint <br/>
 <a href='https://www.cs.jhu.edu/~zongwei/publication/bassi2025scaling.pdf'><img src='https://img.shields.io/badge/Paper-PDF-purple'></a> <a href='https://arxiv.org/abs/2510.14803'><img src='https://img.shields.io/badge/arXiv-2510.14803-b31b1b'></a>
 
@@ -110,7 +110,7 @@ Prior conference paper:
 
 This demo trains and evaluates R-Super (Report Supervision) with only **public data, making it fully-reproducible.** Click here: [**R-Super Merlin Demo**](rsuper_train/Merlin_demo.md)
 
-The data for reproducing our results on the segmentation of 7 tumor types will be released soon, as well as the model's trained weights.
+*The data for reproducing our results on the segmentation of 7 tumor types will be released soon, as well as the model's trained weights.*
 
 Datasets (check the demo for download instructions):
 - **[PanTS](https://github.com/MrGiovanni/PanTS)**: 10K CT, 1.1K pancreatic lesion segmentation masks
