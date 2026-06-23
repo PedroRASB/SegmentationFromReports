@@ -1,4 +1,4 @@
-# Create organ and sub-segment masks
+# Create organ masks
 
 > Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
 
