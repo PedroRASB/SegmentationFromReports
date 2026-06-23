@@ -2,7 +2,7 @@
 
 > Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
 
-This code uses our novel R-Super Loss to train a tumor segmentation AI, using both radiology reports and segmentation masks. To train with reports alone, include the flag --no_mask to the training and data augmentation commands, and skip the "2- Train with masks" step. The code below uses the [MedFormer](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) architecture. 
+This code uses our novel R-Super Loss to train a tumor segmentation AI, using both radiology reports and segmentation masks. To train with reports alone, include the flag --no_mask to the training and data augmentation commands, and skip the "2- Train with masks" step.
 
 > **Public Demo (w/ Merlin and AbdomenAtlas 3.0).** This readme has details that can help you deeply understand R-Super and use it in your own data. Please [**click here for a simple demo**](Merlin_demo.md), which shows you how to quickly train and test R-Super using public datasets (Merlin and AbdomenAtlas 3.0)!
 
@@ -246,4 +246,4 @@ python calculate_sensitivity_specificity_F1_AUC.py --ground_truth_csv /path/to/L
 
 ### Acknowledgement to MedFormer
 
-This training code uses the MedFormer architecture and it is based on [its training code](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) (with heavy modifications). Besides our R-Super, please also [cite MedFormer](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) if you use this architecture. MedFormer is a strong CNN-transformer hybrid that won the [Touchstone Benchamrk](https://github.com/mrgiovanni/touchstone).
+This training code uses the MedFormer architecture and is inspired by [its training code](https://github.com/yhygao/CBIM-Medical-Image-Segmentation). Besides our R-Super, please also [cite MedFormer](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) if you use this architecture. MedFormer is a strong CNN-transformer hybrid that won the [Touchstone Benchamrk](https://github.com/mrgiovanni/touchstone).
