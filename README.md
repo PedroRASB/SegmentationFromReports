@@ -36,12 +36,6 @@ More than 300 million computed tomography (CT) scans are performed worldwide eac
 The **Volume Loss** enforces the volume of the segmented tumors to match the tumor volume estimated from the report. **Ball Loss** enforces each segmented tumor to match the number, rough location, and diameter described in the report. The **Attenuation Loss** enforces segmented tumors to match the attenuation (relative brightness) in reports. The **Malignancy Loss** teaches the model to distinguish malignant from benign tumors.
 
 
-## Acknowledgement
-
-This work was supported by the Lustgarten Foundation for Pancreatic Cancer Research. Paper content is covered by patents pending.
-
----
-
 ## Relationship to Previous Conference Paper
 
 This paper builds on the methodology in our prior conference work "Learning Segmentation From Radiology Reports", winner of the *MICCAI 2025 Best Paper Award* (top 2 of 1,027 accepted papers). This paper presents several substantive advancements over the conference work:
@@ -119,3 +113,9 @@ Datasets (check the demo for download instructions):
 
 
 > **Easy to Reproduce** R-Super usually needs 3 steps: LLM extracts tumor information from reports, creation of organ segmentation masks, and training R-Super. Our demo skips steps 1 and 2. You can download the LLM output, organ segmentation masks (Merlin Plus), and just train R-Super. You can also download the trained R-Super checkpoint and test.
+
+
+## Acknowledgement
+
+This work was supported by the Lustgarten Foundation for Pancreatic Cancer Research. Paper content is covered by patents pending.
+
