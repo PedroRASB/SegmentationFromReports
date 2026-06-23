@@ -2,7 +2,7 @@
 
 > Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
 
-This code uses our novel R-Super Loss to train a tumor segmentation AI, using both radiology reports and segmentation masks. To train with reports alone, include the flag --no_mask to the training and data augmentation commands, and skip the ``2- Train with masks'' step. The code below uses the [MedFormer](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) architecture. 
+This code uses our novel R-Super Loss to train a tumor segmentation AI, using both radiology reports and segmentation masks. To train with reports alone, include the flag --no_mask to the training and data augmentation commands, and skip the "2- Train with masks" step. The code below uses the [MedFormer](https://github.com/yhygao/CBIM-Medical-Image-Segmentation) architecture. 
 
 > **Public Demo (w/ Merlin and AbdomenAtlas 3.0).** This readme has details that can help you deeply understand R-Super and use it in your own data. Please [**click here for a simple demo**](Merlin_demo.md), which shows you how to quickly train and test R-Super using public datasets (Merlin and AbdomenAtlas 3.0)!
 
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 
 
 
-**1-Dataset format.** Assemble your datasets in the format below. We consider that you have a dataset of CT-Mask pairs (e.g., [MSD](http://medicaldecathlon.com), [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/)) and a dataset of CT-Report pairs (e.g., [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/), [CT-Rate](https://huggingface.co/datasets/ibrahimhamamci/CT-RATE), [Merlin](https://stanfordaimi.azurewebsites.net/datasets/60b9c7ff-877b-48ce-96c3-0194c8205c40)). In this case, you will need organ segmentation masks for both (see [organ_masks](../organ_masks/README.md) to create them). Organize both in the format below, in different paths (e.g., dataset_masks and dataset_reports). *Repeat steps 2, 3 and 4 (below) for each of the datasets.* We will call the outputs dataset_masks_npz and dataset_reports_npz.
+**1-Dataset format.** Assemble your datasets in the format below. We consider that you have a dataset of CT-Mask pairs (e.g., [MSD](http://medicaldecathlon.com), [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/)) and a dataset of CT-Report pairs (e.g., [Merlin](https://stanfordaimi.azurewebsites.net/datasets/60b9c7ff-877b-48ce-96c3-0194c8205c40)). In this case, you will need organ segmentation masks for both (see [organ_masks](../organ_masks/README.md) to create them). Organize both in the format below, in different paths (e.g., dataset_masks and dataset_reports). *Repeat steps 2, 3 and 4 (below) for each of the datasets.* We will call the outputs dataset_masks_npz and dataset_reports_npz.
 
 <details>
 <summary style="margin-left: 25px;">Dataset format.</summary>
@@ -99,7 +99,7 @@ R-Super trains in two steps. First, with only the CT scans with tumor segmentati
 The code bellow will start a python process that will keep running forever (you can stop it with 'pkill -f rsuper'). This process will keep performing data augmentation and saving the augmented data to disk. *Always deep it running while you train. Restart it in case it stops.* This code uses only CPU, no GPU.
 
 ```bash
-python AugmentEternal.py --dataset atlas_ufo --model medformer --dimension 3d --batch_size 2 --crop_on_tumor --workers_overwrite 4 --save_destination /path/to/augmented_dataset_masks_and_reports/ --dataset_path /path/to/dataset_masks_npz/ --UFO_root /path/to/dataset_reports_npz/  --reports /path/to/LLM_per_CT_metadata.csv &
+python AugmentEternal.py --dataset atlas_ufo_multi_tumor --model medformer --dimension 3d --batch_size 2 --crop_on_tumor --workers_overwrite 4 --save_destination /path/to/augmented_dataset_masks_and_reports/ --dataset_path /path/to/dataset_masks_npz/ --UFO_root /path/to/dataset_reports_npz/  --reports /path/to/LLM_per_CT_metadata.csv &
 ```
 
 - /path/to/LLM_per_CT_metadata.csv: path to the output of the LLM analysis of reports, see [report_extraction](../report_extraction/README.md)
@@ -152,7 +152,7 @@ To continue training from an interrupted run, add:  --resume --load exp/abdomena
 **3- Train with Reports and Masks.**
 
 ```bash
-python train_ddp.py --dataset abdomenatlas_ufo --model medformer --dimension 3d --batch_size 2 --unique_name mask_and_report_model_name  --crop_on_tumor --gpu '0' --workers 2 --load_augmented  --pretrain --pretrained exp/abdomenatlas/mask_only_model_name/fold_0_latest.pth --loss ball_dice_last --dist_url tcp://127.0.0.1:8002 --report_volume_loss_basic 0.1  --save_destination /path/to/augmented_dataset_masks_and_reports/ --data_root /path/to/dataset_masks_npz/ --UFO_root /path/to/dataset_reports_npz/ --epochs 100 --lr 0.0001 --reports /path/to/LLM_per_CT_metadata.csv
+python train_ddp.py --dataset abdomenatlas_ufo_multi_tumor --model medformer --dimension 3d --batch_size 2 --unique_name mask_and_report_model_name  --crop_on_tumor --gpu '0' --workers 2 --load_augmented  --pretrain --pretrained exp/abdomenatlas/mask_only_model_name/fold_0_latest.pth --loss ball_dice_last --dist_url tcp://127.0.0.1:8002 --report_volume_loss_basic 0.1  --save_destination /path/to/augmented_dataset_masks_and_reports/ --data_root /path/to/dataset_masks_npz/ --UFO_root /path/to/dataset_reports_npz/ --epochs 100 --lr 0.0001 --reports /path/to/LLM_per_CT_metadata.csv --balanced_cropper --attenuation_classifier 'MLP' --attenuation_classifier_venous --att_weight 0.01 --slice_loss --use_all_data --use_sample_weigths --cls_on_segmentation
 ```
 
 
@@ -214,7 +214,7 @@ To continue training from an interrupted run, add:  --resume --load exp/abdomena
 **2- Inference.** The code below will inference your R-Super model, generating binary segmentation masks. To save probabilities, add the argument --save_probabilities or --save_probabilities_lesions (which saves only probabilities for lesions, not for organs). The optional argument --organ_mask_on_lesion will use organ segmentations (produced by the R-Super model itself, not ground-truth) to remove tumor predictions outside its organ. 
 
 ```bash
-python predict_abdomenatlas.py --load exp/abdomenatlas_ufo/mask_and_report_model_name/fold_0_latest.pth --img_path /path/to/test/dataset/ --class_list dataset_conversion/label_names.yaml --save_path /path/to/inference/output/ --organ_mask_on_lesion --save_probabilities_lesions
+python predict_abdomenatlas.py --load exp/abdomenatlas_ufo/mask_and_report_model_name/fold_0_latest.pth --img_path /path/to/test/dataset/ --class_list dataset_conversion/label_names.yaml --save_path /path/to/inference/output/ --organ_mask_on_lesion --save_probabilities_lesions --cls_on_segmentation
 ```
 <details>
 <summary style="margin-left: 25px;"> Argument Details </summary>
