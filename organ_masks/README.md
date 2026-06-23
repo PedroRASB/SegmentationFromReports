@@ -2,9 +2,9 @@
 
 > Part of **R-Super** — _Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports_. R-Super segments seven understudied tumor types — spleen, gallbladder, prostate, bladder, uterus, esophagus, and adrenal — by learning from radiology reports. See the [main README](../README.md) and [paper](https://arxiv.org/abs/2510.14803).
 
-We use an [nnU-Net](https://github.com/MIC-DKFZ/nnUNet), trained for organ segmentation on [AbdomenAtlas 2.0](https://github.com/MrGiovanni/RadGPT/), to create segmentation masks for the pancreas sub-segments (head, body and tail), kidneys, and many other organs. We provide its weights below. Organ segmentation masks be later used by our report-based loss functions.
+We use an [nnU-Net](https://github.com/MIC-DKFZ/nnUNet), trained for organ segmentation on [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/), to create segmentation masks for the pancreas sub-segments (head, body and tail), kidneys, and many other organs. We provide its weights below. Organ segmentation masks be later used by our report-based loss functions.
 
-**Repeat twice:** We consider that you have a dataset of CT-Mask pairs (e.g., [MSD](http://medicaldecathlon.com), [AbdomenAtlas 2.0](https://github.com/MrGiovanni/RadGPT/)) and a dataset of CT-Report pairs (e.g., [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/), [CT-Rate](https://huggingface.co/datasets/ibrahimhamamci/CT-RATE), [Merlin](https://stanfordaimi.azurewebsites.net/datasets/60b9c7ff-877b-48ce-96c3-0194c8205c40)). In this case, you will need organ segmentation masks for both (at least for the organs with tumors). You may use your own masks, or generate them with the code below. To you generate them for both datasets, just run the code below twice, once for each dataset (use different paths for each dataset).
+**Repeat twice:** We consider that you have a dataset of CT-Mask pairs (e.g., [MSD](http://medicaldecathlon.com), [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/)) and a dataset of CT-Report pairs (e.g., [AbdomenAtlas 3.0](https://github.com/MrGiovanni/RadGPT/), [CT-Rate](https://huggingface.co/datasets/ibrahimhamamci/CT-RATE), [Merlin](https://stanfordaimi.azurewebsites.net/datasets/60b9c7ff-877b-48ce-96c3-0194c8205c40)). In this case, you will need organ segmentation masks for both (at least for the organs with tumors). You may use your own masks, or generate them with the code below. To you generate them for both datasets, just run the code below twice, once for each dataset (use different paths for each dataset).
 
 > **Merlin Masks:** To train R-Super with the Merlin dataset, you can skip this step! We have released the **Merlin Plus** dataset, consisting of 44 organ segmentation masks for each of the 25K CT scans in Merlin. With Merlin Plus, you have a large public dataset with CT, reports and masks. [Download it here!](https://huggingface.co/datasets/AbdomenAtlas/MerlinPlus/)
 
@@ -107,7 +107,7 @@ python split_labels.py --input_dir /path/to/nnunet/output/ --output_dir /path/to
 <details>
   <summary>(Optional) Train nnU-Net to segment/sub-segment organs</summary>
 
-If you want to apply R-Super to segment tumors in organs that our nnU-Net does not segment, you will need to train your own nnU-Net to create the segmentation masks for these organs. The code below explains how to train the nnU-Net for organ segmentation. It uses the AbdomenAtlas 2.0 dataset, found at https://github.com/MrGiovanni/RadGPT/.
+If you want to apply R-Super to segment tumors in organs that our nnU-Net does not segment, you will need to train your own nnU-Net to create the segmentation masks for these organs. The code below explains how to train the nnU-Net for organ segmentation. It uses the AbdomenAtlas 3.0 dataset, found at https://github.com/MrGiovanni/RadGPT/.
 
 
 ### (I) prepare dataset
