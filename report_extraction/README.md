@@ -4,8 +4,6 @@
 
 We use Qwen 3 (zero-shot) and radiologist-designed prompts to extract tumor information (count, diameters, locations) from free-text radiology reports. We run the LLM *only once*, and store its outputs. Later, this information will be used by our new loss functions to train the segmentation model.
 
-> **Merlin:** We already ran our LLM over the entire Melrin dataset, extracting information about multiple tumor types. So, for Merlin, you can skip this readme and just get the LLM outputs, which are the .csv files [here](../rsuper_train/Merlin_metadata_hf_clean.csv)
-
 ## Install
 
 <details>
