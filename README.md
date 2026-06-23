@@ -59,7 +59,7 @@ Github: https://github.com/MrGiovanni/R-Super
 
 <b>Large-Scale Multi-Cancer Detection by Learning Segmentation from Reports</b> <br/>
 [Pedro R. A. S. Bassi](https://scholar.google.com/citations?user=NftgL6gAAAAJ&hl=en), Xinze Zhou, [Wenxuan Li](https://scholar.google.com/citations?hl=en&user=tpNZM2YAAAAJ), Szymon Płotka, Jakob Wasserthal, [Jieneng Chen](https://scholar.google.com/citations?user=yLYj88sAAAAJ&hl=zh-CN), ...,[Akshay S. Chaudhari](https://scholar.google.com/citations?user=08Y4NhMAAAAJ&hl=en), [Curtis P. Langlotz](https://scholar.google.com.vn/citations?user=WQkBYwQAAAAJ&hl=vi), [Ulas Bagci](https://scholar.google.com/citations?user=9LUdPM4AAAAJ&hl=en), [Sergio Decherchi](https://scholar.google.com/citations?user=T09qQ1IAAAAJ&hl=it), [Andrea Cavalli](https://scholar.google.com/citations?user=4xTOvaMAAAAJ&hl=en), [Arkadiusz Sitek](https://scholar.google.com/citations?user=3QheHgMAAAAJ&hl=en), [Kang Wang](https://radiology.ucsf.edu/people/kang-wang), [Yang Yang](https://scholar.google.com/citations?hl=en&user=6XsJUBIAAAAJ), [Alan Yuille](https://www.cs.jhu.edu/~ayuille/), [Zongwei Zhou](https://www.zongweiz.com/)* <br/>
-*Johns Hopkins University, UCSF, Harvard Medical School / Massachusetts General Hospital, Stanford University, and collaborators* <br/>
+*Johns Hopkins University, UCSF, Harvard Medical School, Stanford University, and collaborators* <br/>
 Preprint <br/>
 <a href='https://www.cs.jhu.edu/~zongwei/publication/bassi2025scaling.pdf'><img src='https://img.shields.io/badge/Paper-PDF-purple'></a> <a href='https://arxiv.org/abs/2510.14803'><img src='https://img.shields.io/badge/arXiv-2510.14803-b31b1b'></a>
 
