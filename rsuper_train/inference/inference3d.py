@@ -235,25 +235,19 @@ def inference_2_stages(net, img, args, organs_with_tumors=None, class_list=None)
     #stage 1: coarse, run over all the CT
     pred_output, cls_output = inference_sliding_window_one_pass(net, img, args, pancreas=None,gaussian=True)
     pred_output_stage_1_binary = (pred_output > 0.5).float()
-    #stage 2: for each organ in organs_with_tumors, crop and run stage-2 inference,
-    # but ONLY paste back the lesion channel for that organ (and the matching cls
-    # channel). Sparse per-channel buffers replace the (1, classes, D, H, W) and
-    # (1, n_cls, D, H, W) bfloat16 buffers — ~74/9 ≈ 8× cut on the seg buffer.
-    # Mirrors inference3d_teacher.inference_2_stages_teacher (commit 05b5f4d).
+    #stage 2: identify organs with lesion, crop on them, substitute over output. For overlaps in stage 2, do simple average.
+    
+    #prepare zero tensor for output
     B, C, D, H, W = img.shape
     win_d, win_h, win_w = args.window_size
-
-    # cls channel ordering = alphabetically-sorted lesion classes (matches the
-    # ordering produced by predict_abdomenatlas.init_model for the cls head).
-    cls_class_list = sorted([c for c in class_list if 'lesion' in c])
-
+    
+    #run over each organ that may have tumors
     for batch in range(B):
-        pred_per_ch = {}         # seg lesion_ch -> (D, H, W) bfloat16 sum
-        counter_per_ch = {}      # seg lesion_ch -> (D, H, W) bfloat16 counter
-        cls_per_ch = {}          # cls_ch -> (D, H, W) bfloat16 sum
-        cls_counter_per_ch = {}  # cls_ch -> (D, H, W) bfloat16 counter
-        one_count = torch.ones((win_d, win_h, win_w), dtype=torch.bfloat16).cpu()
-
+        pred_output_stage_2 = torch.zeros((1, args.classes, D, H, W)).to(torch.bfloat16).cpu()#.to(img.device)
+        pred_output_cls_stage_2 = None
+        
+        counter = torch.zeros((1, 1, D, H, W)).to(torch.bfloat16).cpu()#.to(img.device)
+        one_count = torch.ones((1, 1, win_d, win_h, win_w),dtype=torch.bfloat16).cpu()#.to(img.device)
         for org in organs_with_tumors:
             org_idx = class_list.index(org)
             #check if the organ is present
@@ -261,7 +255,7 @@ def inference_2_stages(net, img, args, organs_with_tumors=None, class_list=None)
                 #get the mask of the organ
                 organ_mask = pred_output_stage_1_binary[batch, org_idx, :, :, :]
                 x=img[batch,0]
-                out = crop_foreground_3d(tensor_ct=x, tensor_lab=pred_output_stage_1_binary[batch], foreground=organ_mask,
+                out = crop_foreground_3d(tensor_ct=x, tensor_lab=pred_output_stage_1_binary[batch], foreground=organ_mask, 
                                          crop_size=[win_d, win_h, win_w],rand=False,return_coordinate=True)
                 if not isinstance(out, tuple):
                     #failed crop on organ
@@ -269,16 +263,6 @@ def inference_2_stages(net, img, args, organs_with_tumors=None, class_list=None)
                     continue
                 cropped_ct, _, cropped_organ, coord = out
                 d_start_idx,d_end_idx, h_start_idx,h_end_idx, w_start_idx,w_end_idx = coord
-
-                # Resolve the seg lesion channel for this organ before running
-                # stage 2 — if there's no matching channel in class_list, skip
-                # (no place to paste).
-                lesion_name = _lesion_like_name(org)
-                if lesion_name not in class_list:
-                    print(f"[stage2] no lesion channel for {org} (lesion_name={lesion_name}) — skip")
-                    continue
-                lesion_ch = class_list.index(lesion_name)
-
                 #run inference on the cropped ct
                 with torch.no_grad():
                     model_output = net(cropped_ct.unsqueeze(0).unsqueeze(0))
@@ -291,49 +275,33 @@ def inference_2_stages(net, img, args, organs_with_tumors=None, class_list=None)
                         pred = pred[0]
                     if isinstance(model_output, dict):
                         pred_cls = classification_to_3D(model_output, pred.shape[-3], pred.shape[-2], pred.shape[-1])
-
+                    
                     if not args.epai_stage_2:
                         pred = torch.sigmoid(pred)
                         #print('using sigmoid')
                     else:
                         pred = F.softmax(pred, dim=1)
+                #add the prediction to the output of stage 2
+                pred_output_stage_2[:, :, d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += pred.to(torch.bfloat16).cpu()
+                if pred_cls is not None:
+                    if pred_output_cls_stage_2 is None:
+                        pred_output_cls_stage_2 = torch.zeros((1, pred_cls.shape[1], D, H, W),dtype=torch.bfloat16).cpu()
+                    pred_output_cls_stage_2[:, :, d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += pred_cls.to(torch.bfloat16).cpu()
+                counter[:, :, d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += one_count.to(torch.bfloat16).cpu()
+        mask = (counter > 0).float()
+        #add epsilon to avoid division by zero
+        counter = counter*mask + 1e-6*(1-mask)
+        pred_output_stage_2 /= counter
+        if pred_output_cls_stage_2 is not None:
+            pred_output_cls_stage_2 /= counter
 
-                # Paste only the seg lesion channel for this organ.
-                if lesion_ch not in pred_per_ch:
-                    pred_per_ch[lesion_ch] = torch.zeros((D, H, W), dtype=torch.bfloat16).cpu()
-                    counter_per_ch[lesion_ch] = torch.zeros((D, H, W), dtype=torch.bfloat16).cpu()
-                pred_per_ch[lesion_ch][d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += pred[0, lesion_ch].to(torch.bfloat16).cpu()
-                counter_per_ch[lesion_ch][d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += one_count
-
-                # Paste only the cls channel for this lesion (cls head ordering
-                # matches sorted(lesion_classes) per predict_abdomenatlas init).
-                if pred_cls is not None and lesion_name in cls_class_list:
-                    cls_ch = cls_class_list.index(lesion_name)
-                    if cls_ch not in cls_per_ch:
-                        cls_per_ch[cls_ch] = torch.zeros((D, H, W), dtype=torch.bfloat16).cpu()
-                        cls_counter_per_ch[cls_ch] = torch.zeros((D, H, W), dtype=torch.bfloat16).cpu()
-                    cls_per_ch[cls_ch][d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += pred_cls[0, cls_ch].to(torch.bfloat16).cpu()
-                    cls_counter_per_ch[cls_ch][d_start_idx:d_end_idx, h_start_idx:h_end_idx, w_start_idx:w_end_idx] += one_count
-
-        # Blend per-channel: average the stage-2 paste-backs over the counter,
-        # then replace stage-1 voxels where counter>0 with the average.
-        # Stage-1 values on other channels and on untouched voxels are kept.
-        for ch, pred_t in pred_per_ch.items():
-            counter_t = counter_per_ch[ch]
-            ch_mask = (counter_t > 0).float()
-            counter_safe = counter_t * ch_mask + 1e-6 * (1 - ch_mask)
-            avg = pred_t / counter_safe
-            pred_output[batch, ch] = (1 - ch_mask) * pred_output[batch, ch] + ch_mask * avg
-
-        if cls_output is not None:
-            for ch, pred_t in cls_per_ch.items():
-                counter_t = cls_counter_per_ch[ch]
-                ch_mask = (counter_t > 0).float()
-                counter_safe = counter_t * ch_mask + 1e-6 * (1 - ch_mask)
-                avg = pred_t / counter_safe
-                cls_output[batch, ch] = (1 - ch_mask) * cls_output[batch, ch] + ch_mask * avg
-
+        #use mask to merge pred_output_stage_2 with pred_output
+        pred_output[batch] = (1-mask) * pred_output[batch] + mask * pred_output_stage_2
+        if pred_output_cls_stage_2 is not None:
+            cls_output[batch] = (1-mask) * cls_output[batch] + mask * pred_output_cls_stage_2
+        
     return pred_output, cls_output
+
                 
                 
 

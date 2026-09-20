@@ -7,7 +7,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(".."))
 from training import losses_foundation as lf
-from MTL.code.optim import *
 
 def get_model(args, pretrain=False, classes=None, classes_cls=None):
     
@@ -175,6 +174,7 @@ def get_model(args, pretrain=False, classes=None, classes_cls=None):
                 print('Using fixed loss weights')
                 
             if args.mtl is not None:
+                from MTL.code.optim import get_method
                 if args.learnable_loss_weights:
                     raise ValueError('You cannot use learnable loss weights and a custom balancer together')
                 net.balancer = get_method(args.mtl)
